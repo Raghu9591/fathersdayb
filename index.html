@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapido Father's Day</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #F4EACF; 
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.landing-page {
+    width: 100%;
+    max-width: 600px;
+    max-height: 100dvh;
+    aspect-ratio: 600/850;
+    position: relative;
+    overflow: hidden;
+    background: url('Asset01_bg_FD.jpg') center center/cover no-repeat;
+}
+
+/* nostalgic glow */
+.landing-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,220,180,.12), transparent 65%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* logo */
+.logo {
+    position: absolute;
+    top: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38%;
+    max-width: 150px;
+    z-index: 20;
+}
+
+.logo img {
+    width: 100%;
+    display: block;
+}
+
+/* slideshow */
+.slideshow {
+    position: absolute;
+    top: 12%;
+    left: 0;
+    width: 100%;
+    height: 78%;
+    perspective: 2000px;
+}
+
+/* slides */
+.slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transform-origin: left center;
+    transform: rotateY(-90deg) scale(.95);
+    transition: transform 1.2s cubic-bezier(.22,.61,.36,1), opacity .8s ease;
+    backface-visibility: hidden;
+    z-index: 1;
+}
+
+.slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: rotateY(0deg) scale(1);
+    z-index: 5;
+}
+
+.slide.prev {
+    opacity: 0;
+    transform: rotateY(90deg) scale(.95);
+    z-index: 2;
+}
+
+/* text image */
+.slide-text {
+    width: 85%;
+    max-width: 500px;
+    margin-bottom: 0px;
+    margin-top: 20px;
+}
+
+.slide-text img {
+    width: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 1.6s ease .6s, transform 1.6s ease .6s;
+}
+
+.slide.active .slide-text img {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* main image */
+.slide-image {
+    width: 90%;
+    max-width: 540px;
+}
+
+.slide-image img {
+    width: 100%;
+    display: block;
+    opacity: 0;
+    transform: scale(0.96) translateY(15px);
+    transition: opacity 1.8s ease, transform 6s ease;
+}
+
+.slide.active .slide-image img {
+    opacity: 1;
+    transform: scale(1.08) translateY(0);
+}
+
+.end-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.end-frame-link {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.end-frame-link img {
+    width: 100%;
+    max-width: 400px;
+    opacity: 0;
+    transform: scale(.92);
+    transition: opacity .8s ease, transform .8s ease;
+}
+
+.end-slide.active .end-frame-link img {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* popup / overlay */
+.end-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: .5s ease;
+    z-index: 9999;
+}
+
+.end-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Desktop popup styles */
+.end-popup {
+    width: 450px;
+    max-width: 90%;
+    display: block;
+    transform: translateY(300px) scale(.7);
+    opacity: 0;
+    transition: transform .8s cubic-bezier(.22,1,.36,1), opacity .8s ease;
+}
+
+.end-overlay.show .end-popup {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.end-popup img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+.landing-page.end-active .logo,
+.landing-page.end-active .slider-controls,
+.landing-page.end-active .slideshow {
+    opacity: 0;
+    pointer-events: none;
+    transition: .5s ease;
+}
+
+/* =========================================
+   MINIMAL SMALL CONTROLS
+========================================== */
+.slider-controls {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Tighter gap for smaller buttons */
+    z-index: 50;
+}
+
+/* Base style for both arrows */
+.slider-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    width: 36px;  /* Small size */
+    height: 36px; /* Small size */
+    font-size: 14px; /* Scaled down icon */
+    padding-bottom: 2px; /* Visual center adjustment for HTML arrows */
+}
+
+/* Previous Button: Dark gray border, transparent bg, black sign */
+#prevBtn {
+    background: transparent;
+    border: 1.5px solid #4a4a4a;
+    color: #000000;
+}
+
+#prevBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: scale(1.05);
+}
+
+/* Next Button: Dark gray background, white sign */
+#nextBtn {
+    background: #4a4a4a;
+    border: 1.5px solid #4a4a4a; /* Match background so sizes remain exactly identical */
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* Slight shadow for depth */
+}
+
+#nextBtn:hover {
+    background: #333333;
+    border-color: #333333;
+    transform: scale(1.05);
+}
+
+/* Small Mute Toggle Button */
+.mute-toggle {
+    position: absolute;
+    bottom: 25px;
+    right: 20px;
+    width: 36px; /* Scaled down to match arrows */
+    height: 36px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.mute-toggle:hover {
+    background: rgba(0, 0, 0, 0.75);
+    transform: scale(1.05);
+}
+
+/* mobile */
+.end-slide.active .end-frame-link img {
+    animation: popup .6s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+@keyframes popup {
+    0% { transform: scale(.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@media(max-width:768px) {
+    /* Full screen mobile override */
+    .landing-page {
+        width: 100vw;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+        aspect-ratio: auto; 
+        background-size: cover; 
+        background-position: center center;
+    }
+
+    .logo { top: 6%; width: 42%; }
+    .slideshow { top: 15%; height: 72%; }
+    .slide-text { width: 90%; margin-top: 10px; }
+    .slide-image { width: 95%; max-width: 420px; }
+    
+    .slider-controls { bottom: 8%; gap: 20px; } 
+    
+    /* Slightly larger for touch usability on mobile, but still minimal */
+    .slider-arrow { width: 42px; height: 42px; font-size: 16px; }
+    
+    .mute-toggle { bottom: 6%; right: 5%; width: 42px; height: 42px; font-size: 16px;}
+
+    /* Popup styles for mobile */
+    .end-popup {
+        width: 94vw;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform: translateY(300px) scale(.7);
+        opacity: 0;
+        transition: transform .8s cubic-bezier(.22,1,.36,1), opacity .8s ease;
+    }
+
+    .end-popup img {
+        width: 100%;
+        height: auto;
+        max-height: 85dvh;
+        object-fit: contain;
+        border-radius: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="landing-page">
+    <audio id="bgMusic" loop autoplay playsinline>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="logo">
+        <img src="rapido_logo.png" alt="">
+    </div>
+
+    <div class="slideshow">
+        <div class="slide">
+            <div class="slide-text">
+                <img src="Asset02_slide_text_1_FD.png" alt="">
+            </div>
+            <div class="slide-image">
+                <img src="Asset02_slide_1_FD.png" alt="">
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-text">
+                <img src="Asset03_slide_text_2_FD.png" alt="">
+            </div>
+            <div class="slide-image">
+                <img src="Asset03_slide_2_FD.png" alt="">
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-text">
+                <img src="Asset04_slide_text_3_FD.png" alt="">
+            </div>
+            <div class="slide-image">
+                <img src="Asset04_slide_3_FD.png" alt="">
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-text">
+                <img src="Asset05_slide_text_4_FD.png" alt="">
+            </div>
+            <div class="slide-image">
+                <img src="Asset05_slide_4_FD.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="end-overlay" id="endOverlay">
+        <a href="https://www.rapido.bike/" target="_blank" class="end-popup" onclick="logEvent('cta_clicked')">
+            <img src="end_slate.jpg" alt="Father's Day">
+        </a>
+    </div>
+        
+    <div class="slider-controls">
+        <button class="slider-arrow" id="prevBtn">&#10094;</button>
+        <button class="slider-arrow" id="nextBtn">&#10095;</button>
+    </div>
+
+    <button id="muteToggle" class="mute-toggle" title="Toggle Sound">🔇</button>
+</div>
+
+<script>
+/* ================= TRACKING ================= */
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbw-jH9t-xf1uPm6Sk9SpcocdxI2iwaKrwh7xPFHtihDcFEjWSUB1uk0bW63wVyN975E/exec";
+const CAMPAIGN = "fathers_day_2025";
+const uid = new URLSearchParams(window.location.search).get('uid') || 'unknown';
+
+function logEvent(eventName) {
+    try {
+        fetch(SHEET_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                timestamp: new Date().toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'}),
+                uid: uid,
+                campaign: CAMPAIGN,
+                event: eventName,
+                device: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+            })
+        });
+    } catch(e) {}
+}
+
+/* track each slide only once */
+const slideTracked = {};
+function trackSlideView(index) {
+    const eventName = "slide" + (index + 1) + "_viewed";
+    if (slideTracked[eventName]) return;
+    slideTracked[eventName] = true;
+    logEvent(eventName);
+}
+
+/* Fires on page load */
+logEvent("page_landed");
+
+const slides = document.querySelectorAll('.slide');
+const nextBtn = document.getElementById('nextBtn');
+const prevBtn = document.getElementById('prevBtn');
+const endOverlay = document.getElementById('endOverlay');
+const landingPage = document.querySelector('.landing-page');
+const bgMusic = document.getElementById('bgMusic');
+const muteToggle = document.getElementById('muteToggle');
+
+let current = 0;
+let autoPlay;
+
+/* ==========================
+   SHOW SLIDE
+========================== */
+function showSlide(index){
+    slides.forEach(slide => {
+        slide.classList.remove('active');
+    });
+    requestAnimationFrame(() => {
+        slides[index].classList.add('active');
+    });
+    trackSlideView(index);
+}
+
+/* ==========================
+   FIRST LOAD ANIMATION
+========================== */
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        showSlide(0);
+    }, 200);
+});
+
+/* ==========================
+   NEXT
+========================== */
+function nextSlide(){
+    if(current === slides.length - 1){
+        clearInterval(autoPlay);
+        setTimeout(() => {
+            landingPage.classList.add('end-active');
+            endOverlay.classList.add('show');
+            logEvent("endframe_viewed");
+        }, 1000);
+        return;
+    }
+    current++;
+    showSlide(current);
+}
+
+/* ==========================
+   PREVIOUS
+========================== */
+function prevSlide(){
+    current--;
+    if(current < 0){
+        current = slides.length - 1;
+    }
+    showSlide(current);
+}
+
+/* ==========================
+   AUTOPLAY
+========================== */
+function startAutoPlay(){
+    autoPlay = setInterval(() => {
+        nextSlide();
+    }, 5000);
+}
+
+function resetAutoPlay(){
+    clearInterval(autoPlay);
+    startAutoPlay();
+}
+
+/* ==========================
+   BUTTON EVENTS
+========================== */
+nextBtn.addEventListener('click', () => {
+    if(current === slides.length - 1){
+        endOverlay.classList.add('show');
+        logEvent("endframe_viewed");
+        clearInterval(autoPlay);
+        return;
+    }
+    nextSlide();
+    resetAutoPlay();
+});
+
+prevBtn.addEventListener('click', () => {
+    prevSlide();
+    resetAutoPlay();
+});
+
+/* ==========================
+   TOUCH SWIPE
+========================== */
+let startX = 0;
+document.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+});
+
+document.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const diff = startX - endX;
+    if(Math.abs(diff) > 50){
+        if(diff > 0){
+            nextSlide();
+        } else {
+            prevSlide();
+        }
+        resetAutoPlay();
+    }
+});
+
+startAutoPlay();
+
+/* ==========================
+   AUDIO HANDLING (Smart Autoplay)
+========================== */
+const playPromise = bgMusic.play();
+
+if (playPromise !== undefined) {
+    playPromise.then(() => {
+        bgMusic.muted = false;
+        muteToggle.innerHTML = '🔊'; 
+    }).catch(error => {
+        console.log('Unmuted autoplay blocked. Muting to allow playback.');
+        bgMusic.muted = true;
+        bgMusic.play(); 
+        muteToggle.innerHTML = '🔇';
+    });
+}
+
+muteToggle.addEventListener('click', () => {
+    if (bgMusic.muted) {
+        bgMusic.muted = false;
+        bgMusic.play();
+        muteToggle.innerHTML = '🔊'; 
+    } else {
+        bgMusic.muted = true;
+        muteToggle.innerHTML = '🔇'; 
+    }
+});
+
+document.addEventListener('click', unmuteOnInteraction, { once: true });
+document.addEventListener('touchstart', unmuteOnInteraction, { once: true });
+
+function unmuteOnInteraction() {
+    if (bgMusic.muted) {
+        bgMusic.muted = false;
+        bgMusic.play().then(() => {
+            muteToggle.innerHTML = '🔊';
+        }).catch(err => console.log('Audio still blocked until direct play interaction'));
+    }
+}
+</script>
+
+</body>
+</html>
